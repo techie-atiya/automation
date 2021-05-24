@@ -4,6 +4,21 @@ var_user=""
 var_password=""
 var_ip=""
 date='date'
+get_rpc='''<get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <filter>
+      <syslog xmlns="http://netconf/IP">
+        <log-actions>
+          <remote>
+            <destination>
+              <name>atiya</name>
+            </destination>
+          </remote>
+        </log-actions>
+      </syslog>
+    </filter>
+  </get>'''
+response='''<?xml version="1.0" encoding="UTF-8"?>
+<rpc-reply xmlns="xml:ns:netconf:base:1.0" message-id="123455" xmlns:nc="ns:netconf:base:1.0"><data><syslog xmlns="http://netconf/netconf/syslog"><log-actions><remote><destination><name>atiya</name><udp><address>192.168.17.129</address><port>122</port></udp><log-selector><log-facility><facility>all</facility><severity>info</severity><severity-operator>not-</severity-operator></log-facility></log-selector></destination></remote></log-actions></syslog></data></rpc-reply>'''
 def snmp_set(data, oid):
 	global var_date
 	global var_user
@@ -20,8 +35,6 @@ def snmp_set(data, oid):
 		print("no oid matched to set value")
         if oid =='0.1.0.1.2.4.2':
                 var_password=data
-        else:
-                print("no oid matches to set value")
         if oid =='0.1.0.1.2.5.3':
                 var_ip=data
 
@@ -45,6 +58,14 @@ def cli_get(command):
                 return var_password
         if command =='show ip':
                return var_ip
+def netconf_get(get_rpc):
+	if search('IP', str(get_rpc)):
+       		 if search('atiya', str(get_rpc)):
+           		return response
+        else:
+           print(" Status:  not found")
+           return True
+	
 
 def automation():
 	print("hi")
@@ -100,7 +121,8 @@ def automation():
                 print("ip test case pass")
         else:
                print("ip test case fail")
-        
+        rpc_response=netconf_get(get_rpc)
+        print("rpc get value",rpc_response)
 
 if __name__ == '__main__':
 	automation()
