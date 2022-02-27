@@ -24,19 +24,27 @@ def snmp_set(data, oid):
 	global var_user
         global var_password
         global var_ip
+        status= "suceessful"
+        
 	#snmpset -v2c community string {oid 1.1.1.1.} {value atiya} -format{oid,data}
 	if oid == '0.1.0.1.2.3':
         	var_date=data
 		#print("res",var_date)
-		return
+		return(status)
+                
+
 	if oid == '0.1.0.1.2.4.1' :
 		var_user=data
 	else:
 		print("no oid matched to set value")
         if oid =='0.1.0.1.2.4.2':
                 var_password=data
+                
         if oid =='0.1.0.1.2.5.3':
                 var_ip=data
+        
+        
+
 
 def snmp_get(oid):
 	#value=snmpget -v2c community string {oid 1.1.1.1.} -format{oid}
@@ -48,6 +56,7 @@ def snmp_get(oid):
                  return var_password
         if oid =='0.1.0.1.2.5.3':
                 return var_ip
+        
 def cli_get(command):
 	if command == 'show clock' :
 		#print("hi",var_date)
@@ -71,9 +80,12 @@ def automation():
 	print("hi")
 	oid='0.1.0.1.2.3'
 	data="22 May 2021"
-	snmp_set(data,oid)
+        var=snmp_set(data,oid)
+        print("status value:",var)
+        
 	get_snmp_value=snmp_get(oid)
 	print("snmp value",get_snmp_value)
+ 
         command='show clock'
 	get_cli_value=cli_get(command)
 	print("cli value",get_cli_value)
@@ -97,7 +109,6 @@ def automation():
 		print("User Test case fail")
        	oid='0.1.0.1.2.4.2'
         data="password"
-        snmp_set(data,oid)
         get_snmp_var_password=snmp_get(oid)
         print("snmp get value",get_snmp_var_password)
         command='show password'
@@ -107,6 +118,7 @@ def automation():
                  print("Password Test case pass")
         else:
                  print("Password Test case fail")
+
         
 
         oid='0.1.0.1.2.5.3'
@@ -121,8 +133,18 @@ def automation():
                 print("ip test case pass")
         else:
                print("ip test case fail")
+        #print(get_rpc)
         rpc_response=netconf_get(get_rpc)
-        print("rpc get value",rpc_response)
+        #print("rpc get value",rpc_response)
+        if search(str("192.168.17.129"),str(rpc_response)):
+                 print("ip adress is true")
+                 print("test case pass")
+        else:
+                 print("test case fail")
+                 
+         
+      
+        
 
 if __name__ == '__main__':
 	automation()
